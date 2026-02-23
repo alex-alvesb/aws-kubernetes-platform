@@ -1,0 +1,11 @@
+- name: Configure Kubernetes Master
+  hosts: k8s_master
+  become: true
+  roles:
+    - k3s
+
+- name: Configure Kubernetes Worker
+  hosts: k8s_worker
+  become: true
+  roles:
+    - k3s-worker

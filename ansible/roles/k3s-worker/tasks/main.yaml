@@ -1,0 +1,58 @@
+- name: Set hostname for worker
+  hostname:
+    name: k8s-worker
+
+- name: Update apt
+  apt:
+    update_cache: yes
+
+# add swap
+- name: Check if swap file exists
+  stat:
+    path: /swapfile
+  register: swap_file
+
+- name: Create swap file
+  command: fallocate -l 1G /swapfile
+  when: not swap_file.stat.exists
+
+- name: Set swap file permissions
+  file:
+    path: /swapfile
+    owner: root
+    group: root
+    mode: '0600'
+  when: not swap_file.stat.exists
+
+- name: Format swap file
+  command: mkswap /swapfile
+  when: not swap_file.stat.exists
+
+- name: Enable swap
+  command: swapon /swapfile
+  when: not swap_file.stat.exists
+
+- name: Ensure swap persists after reboot
+  mount:
+    name: none
+    src: /swapfile
+    fstype: swap
+    opts: sw
+    state: present
+###
+
+- name: Install curl
+  apt:
+    name: curl
+    state: present
+    update_cache: yes
+
+- name: Install K3s agent
+  shell: |
+    curl -sfL https://get.k3s.io | \
+    K3S_URL=https://{{ hostvars[groups['k8s_master'][0]].private_ip }}:6443 \
+    K3S_TOKEN={{ hostvars[groups['k8s_master'][0]].k3s_token }} \
+    sh -
+  args:
+    creates: /usr/local/bin/k3s-agent
+
