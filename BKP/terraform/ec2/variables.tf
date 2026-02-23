@@ -2,7 +2,11 @@ variable "aws_region" {
   default = "us-east-1"
 }
 
-variable "instance_type" {
+variable "master_instance_type" {
+  default = "t3.small"
+}
+
+variable "worker_instance_type" {
   default = "t3.micro"
 }
 

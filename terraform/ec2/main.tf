@@ -40,6 +40,14 @@ resource "aws_security_group" "k8s_sg" {
     cidr_blocks = ["0.0.0.0/0"]
 }
 
+  ingress {
+    description = "Internal cluster communication"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    self        = true
+}
+
   egress {
     from_port   = 0
     to_port     = 0

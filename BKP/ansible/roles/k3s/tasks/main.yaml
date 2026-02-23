@@ -1,0 +1,78 @@
+- name: Set hostname for master
+  hostname:
+    name: k8s-master
+
+- name: Update apt
+  apt:
+    update_cache: yes
+
+# add swap
+- name: Check if swap file exists
+  stat:
+    path: /swapfile
+  register: swap_file
+
+- name: Create swap file
+  command: fallocate -l 2G /swapfile
+  when: not swap_file.stat.exists
+
+- name: Set swap file permissions
+  file:
+    path: /swapfile
+    owner: root
+    group: root
+    mode: '0600'
+  when: not swap_file.stat.exists
+
+- name: Format swap file
+  command: mkswap /swapfile
+  when: not swap_file.stat.exists
+
+- name: Enable swap
+  command: swapon /swapfile
+  when: not swap_file.stat.exists
+
+- name: Ensure swap persists after reboot
+  mount:
+    name: none
+    src: /swapfile
+    fstype: swap
+    opts: sw
+    state: present
+###
+
+- name: Install curl
+  apt:
+    name: curl
+    state: present
+
+- name: Get public IP
+  shell: curl -s ifconfig.me
+  register: public_ip
+  changed_when: false
+
+- name: Install K3s with TLS SAN
+  shell: |
+    curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--tls-san {{ public_ip.stdout }}" sh -s - --write-kubeconfig-mode 644
+  args:
+    creates: /usr/local/bin/k3s
+
+- name: Wait for node to be ready
+  shell: |
+    kubectl get nodes
+  register: kubectl_output
+  retries: 10
+  delay: 10
+  until: kubectl_output.rc == 0
+
+# Captura token automaticamente
+- name: Get node token
+  command: cat /var/lib/rancher/k3s/server/node-token
+  register: node_token
+  changed_when: false
+
+# Salva token como fact global
+- name: Set k3s token fact
+  set_fact:
+    k3s_token: "{{ node_token.stdout }}"
+

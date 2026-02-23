@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aws-k8s-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: aws-k8s-app
+  template:
+    metadata:
+      labels:
+        app: aws-k8s-app
+    spec:
+      containers:
+        - name: aws-k8s-app
+          image: IMAGE_PLACEHOLDER
+          ports:
+            - containerPort: 8000
+          env:
+            - name: APP_VERSION
+              value: "v1"

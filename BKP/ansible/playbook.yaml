@@ -4,19 +4,6 @@
   roles:
     - k3s
 
-- name: Get K3s token from master
-  hosts: k8s_master
-  become: true
-  tasks:
-    - name: Read node token
-      command: cat /var/lib/rancher/k3s/server/node-token
-      register: node_token
-      changed_when: false
-
-    - name: Set token fact
-      set_fact:
-        k3s_token: "{{ node_token.stdout }}"
-
 - name: Configure Kubernetes Worker
   hosts: k8s_worker
   become: true

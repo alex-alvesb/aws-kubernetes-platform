@@ -25,12 +25,28 @@ resource "aws_security_group" "k8s_sg" {
   }
 
   ingress {
-    description = "K3s API"
+    description = "K3s API internal"
     from_port   = 6443
     to_port     = 6443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  ingress {
+    description = "Kubernetes NodePort"
+    from_port   = 30000
+    to_port     = 32767
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+}
+
+  ingress {
+    description = "Internal cluster communication"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    self        = true
+}
 
   egress {
     from_port   = 0
@@ -53,7 +69,7 @@ data "aws_ami" "debian" {
 
 resource "aws_instance" "k8s_master" {
   ami                         = data.aws_ami.debian.id
-  instance_type               = var.instance_type
+  instance_type               = var.master_instance_type
   subnet_id                   = var.subnet_id
   vpc_security_group_ids      = [aws_security_group.k8s_sg.id]
   key_name                    = aws_key_pair.k8s_key.key_name
@@ -66,7 +82,7 @@ resource "aws_instance" "k8s_master" {
 
 resource "aws_instance" "k8s_worker" {
   ami                         = data.aws_ami.debian.id
-  instance_type               = var.instance_type
+  instance_type               = var.worker_instance_type
   subnet_id                   = var.subnet_id
   vpc_security_group_ids      = [aws_security_group.k8s_sg.id]
   key_name                    = aws_key_pair.k8s_key.key_name
