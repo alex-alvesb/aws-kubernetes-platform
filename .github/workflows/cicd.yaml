@@ -66,5 +66,5 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git add gitops/apps/app/deployment.yaml
-          git commit -m "ci: update image to ${{ github.sha }}"
-          git push
+          git commit -m "ci: update image to ${{ github.sha }}" || echo "No changes to commit"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main
