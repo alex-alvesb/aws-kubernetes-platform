@@ -76,3 +76,16 @@
   set_fact:
     k3s_token: "{{ node_token.stdout }}"
 
+- name: Get ECR login token
+  shell: aws ecr get-login-password --region {{ aws_region }}
+  register: ecr_token
+  changed_when: false
+
+- name: Create ECR secret in Kubernetes
+  shell: |
+    kubectl create secret docker-registry ecr-secret \
+      --docker-server={{ aws_account_id }}.dkr.ecr.{{ aws_region }}.amazonaws.com \
+      --docker-username=AWS \
+      --docker-password="{{ ecr_token.stdout }}" \
+      --namespace=default \
+      --dry-run=client -o yaml | kubectl apply -f -
