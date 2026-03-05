@@ -55,12 +55,11 @@ jobs:
       - name: Update deployment manifest
         run: |
           IMAGE_TAG=${{ github.sha }}
-          sed -i "s|IMAGE_PLACEHOLDER|$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/aws-k8s-app:$IMAGE_TAG|g" \
-          gitops/apps/app/deployment.yaml
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/aws-k8s-app:$IMAGE_TAG"
 
+          echo "Updating image to $IMAGE"
+
+          sed -i "s|image:.*|image: $IMAGE|g" gitops/apps/app/deployment.yaml
       - name: Commit updated manifest
         run: |
           git config --global user.name "github-actions"
