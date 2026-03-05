@@ -18,7 +18,7 @@ spec:
 
       containers:
         - name: aws-k8s-app
-          image: IMAGE_PLACEHOLDER
+          image: 679346886253.dkr.ecr.us-east-1.amazonaws.com/aws-k8s-app:0243c368ce441c9435378482ff4ba6e6168013ed
           ports:
             - containerPort: 8000
           env:
