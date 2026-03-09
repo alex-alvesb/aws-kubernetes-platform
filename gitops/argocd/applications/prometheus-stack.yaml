@@ -11,8 +11,11 @@ spec:
     chart: kube-prometheus-stack
     targetRevision: 56.0.0
     helm:
-      valueFiles:
-        - values.yaml
+      values: |
+        grafana:
+          service:
+            type: NodePort
+            nodePort: 30030
 
   destination:
     server: https://kubernetes.default.svc
@@ -22,6 +25,3 @@ spec:
     automated:
       prune: true
       selfHeal: true
-
-  sources:
-  - repoURL: https://prometheus-community.github.io/helm-charts

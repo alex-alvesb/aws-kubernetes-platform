@@ -13,7 +13,7 @@
   register: swap_file
 
 - name: Create swap file
-  command: fallocate -l 1G /swapfile
+  command: fallocate -l 2G /swapfile
   when: not swap_file.stat.exists
 
 - name: Set swap file permissions
