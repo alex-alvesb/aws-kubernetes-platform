@@ -10,7 +10,9 @@ spec:
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: kube-prometheus-stack
     targetRevision: 56.0.0
+
     helm:
+      skipCrds: true
       values: |
         grafana:
           service:
