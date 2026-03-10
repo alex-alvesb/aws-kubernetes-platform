@@ -59,7 +59,7 @@ resource "aws_security_group" "k8s_sg" {
 data "aws_ami" "debian" {
   most_recent = true
 
-  owners = ["136693071363"] # Debian official
+  owners = ["136693071363"] 
 
   filter {
     name   = "name"
@@ -74,7 +74,7 @@ resource "aws_instance" "k8s_master" {
   vpc_security_group_ids      = [aws_security_group.k8s_sg.id]
   key_name                    = aws_key_pair.k8s_key.key_name
   associate_public_ip_address = true
-  iam_instance_profile = "ec2-ecr-profile"
+  iam_instance_profile        = "ec2-ecr-profile"
 
   tags = {
     Name = "aws-k8s-master"
@@ -88,7 +88,7 @@ resource "aws_instance" "k8s_worker" {
   vpc_security_group_ids      = [aws_security_group.k8s_sg.id]
   key_name                    = aws_key_pair.k8s_key.key_name
   associate_public_ip_address = true
-  iam_instance_profile = "ec2-ecr-profile"
+  iam_instance_profile        = "ec2-ecr-profile"
 
   tags = {
     Name = "aws-k8s-worker"
