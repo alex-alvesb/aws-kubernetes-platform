@@ -1,0 +1,125 @@
+AWS KUBERNETES PLATFORM - PASSO A PASSO
+
+
+TERRAFORM - PROVISIONAMENTO
+
+cd terraform/ec2
+terraform apply --auto-approve
+
+cd ../ecr
+terraform apply --auto-approve
+
+
+ANSIBLE - CONFIGURAÇÃO DO CLUSTER
+
+Preencher arquivo:
+
+ansible/inventory.ini
+
+Executar:
+
+cd ansible/
+ansible-playbook -i inventory.ini playbook.yaml
+
+
+CONFIGURAÇÃO DO KUBECTL
+
+Acessar master:
+
+sudo cat /etc/rancher/k3s/k3s.yaml
+
+No host local:
+
+rm -r ~/.kube && mkdir -p ~/.kube && nano ~/.kube/config
+
+Alterar:
+
+server: https://127.0.0.1:6443
+
+para:
+server: https://IP_DO_MASTER:6443
+
+Validar:
+
+kubectl get nodes
+
+
+ARGOCD - INSTALAÇÃO
+
+kubectl create namespace argocd
+
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+kubectl get pods -n argocd
+
+EXPOSIÇÃO DO ARGOCD
+
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
+
+kubectl get svc -n argocd
+
+Acessar no navegador:
+
+http://IP_DO_MASTER:NODEPORT
+
+Login:
+
+usuario: admin
+
+senha: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
+
+
+GIT - PRIMEIRO PUSH
+
+Na raiz do projeto:
+
+git add .
+git commit -m "new run"
+git push
+
+
+DEPLOY DA APLICAÇÃO
+
+Aguardar finalização do pipeline e então executar:
+
+kubectl apply -f gitops/argocd/applications/nginx-app.yaml
+
+Validar:
+
+kubectl get pods
+
+
+OBSERVABILIDADE - PROMETHEUS / GRAFANA
+
+kubectl create namespace monitoring
+
+kubectl apply -f gitops/argocd/applications/prometheus-stack.yaml
+
+kubectl get applications -n argocd
+
+kubectl get pods -n monitoring
+
+kubectl get svc -n monitoring
+
+kubectl get svc -n monitoring | grep grafana
+
+Acessar no navegador:
+
+http://IP_DO_MASTER:30030
+
+Login:
+
+usuario: admin
+senha: prom-operator
+
+
+FINALIZAÇÃO - DESTRUIR INFRA
+
+cd ../ec2
+terraform destroy --auto-approve
+
+cd ../ecr
+
+Deletar imagens manualmente na AWS
+
+terraform destroy --auto-approve
