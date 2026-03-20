@@ -1,125 +1,161 @@
-AWS KUBERNETES PLATFORM - PASSO A PASSO
+# AWS Kubernetes Platform - Passo a Passo
 
+---
 
-TERRAFORM - PROVISIONAMENTO
+## Terraform - Provisionamento
 
+```bash
 cd terraform/ec2
 terraform apply --auto-approve
 
 cd ../ecr
 terraform apply --auto-approve
+```
 
-
-ANSIBLE - CONFIGURAÇÃO DO CLUSTER
+## Ansible - Configuração do Cluster
 
 Preencher arquivo:
 
+```
 ansible/inventory.ini
+```
 
 Executar:
 
+```bash
 cd ansible/
 ansible-playbook -i inventory.ini playbook.yaml
+```
 
-
-CONFIGURAÇÃO DO KUBECTL
+## Configuração do Kubectl
 
 Acessar master:
 
+```bash
 sudo cat /etc/rancher/k3s/k3s.yaml
+```
 
 No host local:
 
+```bash
 rm -r ~/.kube && mkdir -p ~/.kube && nano ~/.kube/config
+```
 
 Alterar:
 
+```bash
 server: https://127.0.0.1:6443
+```
 
-para:
+Para:
+
+```bash
 server: https://IP_DO_MASTER:6443
+```
 
 Validar:
 
+```bash
 kubectl get nodes
+```
 
+## ArgoCD - Instalação
 
-ARGOCD - INSTALAÇÃO
-
+```bash
 kubectl create namespace argocd
 
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 kubectl get pods -n argocd
+```
 
-EXPOSIÇÃO DO ARGOCD
+### Exposição do ArgoCD
 
+```bash
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "NodePort"}}'
 
 kubectl get svc -n argocd
+```
 
 Acessar no navegador:
 
+```
 http://IP_DO_MASTER:NODEPORT
+```
 
 Login:
 
+```
 usuario: admin
+senha: 
+```
 
-senha: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d && echo
+```
 
-
-GIT - PRIMEIRO PUSH
+## Git - Primeiro Push
 
 Na raiz do projeto:
 
+```bash
 git add .
 git commit -m "new run"
 git push
+```
 
+## Deploy da Aplicação
 
-DEPLOY DA APLICAÇÃO
+Aguardar finalização do pipeline e executar:
 
-Aguardar finalização do pipeline e então executar:
-
+```bash
 kubectl apply -f gitops/argocd/applications/nginx-app.yaml
+```
 
 Validar:
 
+```bash
 kubectl get pods
+```
 
+## Observabilidade - Prometheus / Grafana
 
-OBSERVABILIDADE - PROMETHEUS / GRAFANA
-
+```bash
 kubectl create namespace monitoring
 
 kubectl apply -f gitops/argocd/applications/prometheus-stack.yaml
 
 kubectl get applications -n argocd
 
-kubectl get pods -n monitoring
+# Comandos úteis:
 
-kubectl get svc -n monitoring
+# kubectl get pods -n monitoring
 
-kubectl get svc -n monitoring | grep grafana
+# kubectl get svc -n monitoring
+
+# kubectl get svc -n monitoring | grep grafana
+```
 
 Acessar no navegador:
 
+```
 http://IP_DO_MASTER:30030
+```
 
 Login:
 
+```
 usuario: admin
 senha: prom-operator
+```
 
+## Finalização - Destruir Infra
 
-FINALIZAÇÃO - DESTRUIR INFRA
+Deletar imagens manualmente na AWS e então:
 
+```bash
 cd ../ec2
 terraform destroy --auto-approve
-
 cd ../ecr
-
-Deletar imagens manualmente na AWS
-
 terraform destroy --auto-approve
+```
