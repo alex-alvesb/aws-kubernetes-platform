@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aws-k8s-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: aws-k8s-app
+  template:
+    metadata:
+      labels:
+        app: aws-k8s-app
+    spec:
+
+      imagePullSecrets:
+        - name: ecr-secret
+
+      containers:
+        - name: aws-k8s-app
+          image: 679346886253.dkr.ecr.us-east-1.amazonaws.com/aws-k8s-app:fa06d1d32980b9e8fc607ef74a07b84cb9c78c00
+          ports:
+            - containerPort: 8000
+          env:
+            - name: APP_VERSION
+              value: "v1"
