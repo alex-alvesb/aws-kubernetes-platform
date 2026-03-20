@@ -1,16 +1,18 @@
+🇺🇸 [Read in English](README.md)
+
 # ☁️ AWS Kubernetes Platform
 
-Projeto de plataforma Kubernetes na AWS utilizando Terraform, Ansible, GitOps com ArgoCD, CI/CD com GitHub Actions e stack de observabilidade com Prometheus e Grafana.
+Kubernetes platform project on AWS using Terraform, Ansible, GitOps with ArgoCD, CI/CD with GitHub Actions, and an observability stack with Prometheus and Grafana.
 
 ---
 
-## 📌 Descrição
+## 📌 Description
 
-Este projeto tem como objetivo demonstrar a construção de uma plataforma completa de DevOps/SRE, cobrindo desde o provisionamento da infraestrutura até o deploy automatizado e monitoramento de aplicações em Kubernetes.
+This project demonstrates the design and implementation of a production-like DevOps/SRE platform on AWS, covering infrastructure provisioning, automated deployments, and observability in a Kubernetes environment.
 
 ---
 
-## 🧠 Arquitetura
+## 🧠 Architecture
 
 ```
 GitHub
@@ -23,14 +25,14 @@ ArgoCD (GitOps)
 ↓
 Kubernetes (K3s - EC2)
 ↓
-Aplicação
+Application
 ↓
 Prometheus + Grafana
 ```
 
 ---
 
-## ⚙️ Tecnologias Utilizadas
+## ⚙️ Technologies Used
 
 - AWS (EC2, ECR, IAM)
 - Terraform
@@ -44,7 +46,7 @@ Prometheus + Grafana
 
 ---
 
-## 📂 Estrutura do Projeto
+## 📂 Project Structure
 
 ```
 aws-kubernetes-platform/
@@ -56,8 +58,8 @@ aws-kubernetes-platform/
 ├── ansible/
 │ ├── group_vars/
 │ └── roles/
-│  ├── k3s/
-│  └── k3s-worker/
+│ ├── k3s/
+│ └── k3s-worker/
 ├── app/
 ├── gitops/
 │ ├── apps/
@@ -66,20 +68,32 @@ aws-kubernetes-platform/
 ├── .github/workflows/
 ├── docs/
 │ ├── screenshots/
-│ └── passo-a-passo.txt
+│ ├── step-by-step.md
+│ └── passo-a-passo.md
 └── README.md
 ```
 
 ---
 
-## 📸 Visualização do Projeto
+## 📸 Project Visualization
 
 📁 /docs/screenshots/
 
 ---
 
-## 🧪 Execução
+## 🧪 Execution
 
-O passo a passo completo para execução do projeto está disponível no arquivo:
+A detailed step-by-step guide to reproduce the full environment (infrastructure, cluster setup, GitOps, and observability) is available at:
 
-📁 /docs/passo-a-passo.txt
+📁 /docs/step-by-step.md
+
+---
+
+## 🎯 Key Features
+
+- End-to-end CI/CD pipeline with automated image build and deployment
+- GitOps workflow using ArgoCD (no manual kubectl apply)
+- Kubernetes cluster provisioned on AWS without managed services (EKS)
+- Integration with AWS ECR as private container registry
+- Observability stack with Prometheus and Grafana
+- Infrastructure fully managed as code (Terraform + Ansible)
