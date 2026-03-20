@@ -97,4 +97,3 @@ A detailed step-by-step guide to reproduce the full environment (infrastructure,
 - Integration with AWS ECR as private container registry
 - Observability stack with Prometheus and Grafana
 - Infrastructure fully managed as code (Terraform + Ansible)
-
